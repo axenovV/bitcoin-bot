@@ -1,7 +1,11 @@
 
 
-token: <token-here>
-apiUrl: https://api.coinmarketcap.com/v1/ticker/?limit=2
+token: <token_here>
+webhook_url: <webhook_here> #like https://www.weebhook.com
+webhook_port: <port_here> #only 443, 80, 88 or 8443.
+server_url: <server_url>
+server_port: <server_port>
+api_url: https://api.coinmarketcap.com/v1/ticker/?limit=2
 
 convert_currency_commands:
   - usd
