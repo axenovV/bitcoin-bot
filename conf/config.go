@@ -21,7 +21,6 @@ type Config struct {
 
 	ApiUrl string `yaml:"api_url"`
 
-	// Ключевые слова для открывания двери
 	ConvertCurrencyCommands []string `yaml:"convert_currency_commands"`
 }
 
