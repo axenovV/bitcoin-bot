@@ -1,4 +1,4 @@
-
+package bothandler
 
 import (
 	"log"
@@ -22,13 +22,13 @@ func (b *BotTelegramHandler) ConnectToBot() error {
 
 	log.Printf("Authorized on account %s", b.BotUpdates.Self.UserName)
 
-	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook("https://www.webhook.vkprism.ru:8443/" + b.BotUpdates.Token))
+	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook("https://webhook.vkprism.ru:80/" + b.BotUpdates.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	updates := b.BotUpdates.ListenForWebhook("/" + b.BotUpdates.Token)
-	go http.ListenAndServe("0.0.0.0:8443", nil)
+	go http.ListenAndServe("95.213.251.26:8443", nil)
 
 	for update := range updates {
 		if update.Message == nil {
