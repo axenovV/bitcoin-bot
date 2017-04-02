@@ -1,0 +1,8 @@
+
+
+token: <token-here>
+apiUrl: https://api.coinmarketcap.com/v1/ticker/?limit=2
+
+convert_currency_commands:
+  - usd
+  - eur
