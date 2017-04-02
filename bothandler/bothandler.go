@@ -1,6 +1,7 @@
 package bothandler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,6 +13,9 @@ type BotTelegramHandler struct {
 	BotUpdates *tgbotapi.BotAPI
 }
 
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+}
 func (b *BotTelegramHandler) ConnectToBot() error {
 	err := b.getBot("363505789:AAFQz5eq5oEgNYWfe5J0HEal_IGXeyuT8lM")
 	if err != nil {
@@ -28,7 +32,9 @@ func (b *BotTelegramHandler) ConnectToBot() error {
 	}
 
 	updates := b.BotUpdates.ListenForWebhook("/" + b.BotUpdates.Token)
+
 	go http.ListenAndServe("95.213.251.26:8443", nil)
+	http.HandleFunc("/", handler)
 
 	for update := range updates {
 		if update.Message == nil {
