@@ -26,7 +26,7 @@ func (b *BotTelegramHandler) ConnectToBot() error {
 
 	log.Printf("Authorized on account %s", b.BotUpdates.Self.UserName)
 
-	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook("https://webhook.vkprism.ru:80/" + b.BotUpdates.Token))
+	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook("https://webhook.vkprism.ru:443/" + b.BotUpdates.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
