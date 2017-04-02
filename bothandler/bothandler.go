@@ -1,10 +1,10 @@
 package bothandler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/axenovv/bitcoin-bot/conf"
 	"github.com/axenovv/bitcoin-bot/models"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -13,11 +13,8 @@ type BotTelegramHandler struct {
 	BotUpdates *tgbotapi.BotAPI
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-func (b *BotTelegramHandler) ConnectToBot() error {
-	err := b.getBot("363505789:AAFQz5eq5oEgNYWfe5J0HEal_IGXeyuT8lM")
+func (b *BotTelegramHandler) ConnectToBot(config *conf.Config) error {
+	err := b.getBot(config.Token)
 	if err != nil {
 		log.Print(err)
 	}
@@ -26,14 +23,14 @@ func (b *BotTelegramHandler) ConnectToBot() error {
 
 	log.Printf("Authorized on account %s", b.BotUpdates.Self.UserName)
 
-	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook("https://webhook.vkprism.ru:443/" + b.BotUpdates.Token))
+	_, err = b.BotUpdates.SetWebhook(tgbotapi.NewWebhook(config.GetFullWebHookUrl() + "/" + b.BotUpdates.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	updates := b.BotUpdates.ListenForWebhook("/" + b.BotUpdates.Token)
 
-	go http.ListenAndServe("95.213.251.26:8443", nil)
+	go http.ListenAndServe(config.GetFullServerUrl(), nil)
 
 	for update := range updates {
 		if update.Message == nil {

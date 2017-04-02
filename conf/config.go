@@ -2,6 +2,7 @@ package conf
 
 import (
 	// Системные пакеты
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	// Парсер yaml файлов
@@ -11,10 +12,25 @@ import (
 type Config struct {
 	// Токен телеграм бота
 	Token string `yaml:"token"`
-	// Разрешенные айдишники чатов
-	AllowedChatIds []int `yaml:"allowed_chat_ids"`
+
+	WebhookUrl  string `yaml:"webhook_url"`
+	WebhookPort string `yaml:"webhook_port"`
+
+	ServerUrl  string `yaml:"server_url"`
+	ServerPort string `yaml:"server_port"`
+
+	ApiUrl string `yaml:"api_url"`
+
 	// Ключевые слова для открывания двери
 	ConvertCurrencyCommands []string `yaml:"convert_currency_commands"`
+}
+
+func (c *Config) GetFullWebHookUrl() string {
+	return fmt.Sprintf("%s:%s", c.WebhookUrl, c.WebhookPort)
+}
+
+func (c *Config) GetFullServerUrl() string {
+	return fmt.Sprintf("%s:%s", c.ServerUrl, c.ServerPort)
 }
 
 func GetDefaultConfig() (*Config, error) {
