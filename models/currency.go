@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/astaxie/beego"
 )
 
 const layout = "Jan 2 2006 3:04pm MST"
@@ -54,7 +52,7 @@ func (c *ResponseCurrencies) GetCurrenciesText() string {
 }
 
 func RequestCurrencies() (*ResponseCurrencies, error) {
-	resp, err := http.Get(beego.AppConfig.String("apiUrl"))
+	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/?limit=2")
 	if err != nil {
 		return nil, err
 	}

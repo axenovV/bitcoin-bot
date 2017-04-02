@@ -5,5 +5,6 @@ func main() {
 }
 
 func startListeningBotUpdate() {
-
+	bot := &BotTelegramHandler{}
+	err := bot.ConnectToBot()
 }
