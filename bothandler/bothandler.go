@@ -47,8 +47,13 @@ func (b *BotTelegramHandler) ConnectToBot(config *conf.Config) error {
 func (b *BotTelegramHandler) handleCommand(command string, message tgbotapi.MessageConfig) {
 
 	switch command {
-	case "usd":
-		response, err := models.RequestCurrencies()
+	case "bit":
+		response, err := models.RequestCurrencies("bitcoin")
+		if err == nil {
+			message.Text = response.GetCurrenciesText()
+		}
+	case "eth":
+		response, err := models.RequestCurrencies("ethereum")
 		if err == nil {
 			message.Text = response.GetCurrenciesText()
 		}

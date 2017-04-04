@@ -72,8 +72,8 @@ func (c *ResponseCurrencies) GetCurrenciesText() string {
 	return text
 }
 
-func RequestCurrencies() (*ResponseCurrencies, error) {
-	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/?limit=2")
+func RequestCurrencies(currency string) (*ResponseCurrencies, error) {
+	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/" + currency)
 	if err != nil {
 		return nil, err
 	}
