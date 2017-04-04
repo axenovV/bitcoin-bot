@@ -52,7 +52,7 @@ func (c *Currency) CurrencyFormating() string {
 	changeOneHour, _ := c.GetPercentChangeOneHourAsFloat()
 	changeOneDay, _ := c.GetPercentChangeOneDayAsFloat()
 	changeOneWeek, _ := c.GetPercentChangeOneWeekAsFloat()
-	return fmt.Sprintf("💵 %s: $%s \n 🕔 Last Update: %s \n 📈 Change 1h: %.2f \n 📈 Change 1d: %.2f \n 📈 Change 1w: %.2f", c.Symbol, c.UsdPrice, c.GetLastUpdateTimeAsString(), changeOneHour, changeOneDay, changeOneWeek)
+	return fmt.Sprintf("💵 %s: $%s \n 🕔 Last Update: %s \n 📈 Change 1h: %.2f % \n 📈 Change 1d: %.2f % \n 📈 Change 1w: %.2f %", c.Symbol, c.UsdPrice, c.GetLastUpdateTimeAsString(), changeOneHour, changeOneDay, changeOneWeek)
 }
 
 type ResponseCurrencies struct {
