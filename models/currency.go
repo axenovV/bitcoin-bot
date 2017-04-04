@@ -12,26 +12,47 @@ import (
 const layout = "Jan 2 2006 3:04pm MST"
 
 type Currency struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Symbol      string `json:"symbol"`
-	UsdPrice    string `json:"price_usd"`
-	EurPrice    string `json:"price_eur"`
-	LastUpdated string `json:"last_updated"`
+	Id                   string `json:"id"`
+	Name                 string `json:"name"`
+	Symbol               string `json:"symbol"`
+	UsdPrice             string `json:"price_usd"`
+	EurPrice             string `json:"price_eur"`
+	LastUpdated          string `json:"last_updated"`
+	PercentChangeOneHour string `json:"percent_change_1h"`
+	PercentChangeOneDay  string `json:"percent_change_24h"`
+	PercentChangeOneWeek string `json:"percent_change_7d"`
 }
 
-func (c Currency) CurrencyFormating() string {
+func (c *Currency) GetPercentChangeOneHourAsFloat() (float64, error) {
+	percent, err := strconv.ParseFloat(c.PercentChangeOneHour, 64)
+	return percent, err
+}
+
+func (c *Currency) GetPercentChangeOneDayAsFloat() (float64, error) {
+	percent, err := strconv.ParseFloat(c.PercentChangeOneDay, 64)
+	return percent, err
+}
+
+func (c *Currency) GetPercentChangeOneWeekAsFloat() (float64, error) {
+	percent, err := strconv.ParseFloat(c.PercentChangeOneWeek, 64)
+	return percent, err
+}
+
+func (c *Currency) GetLastUpdateTimeAsString() string {
 	i, err := strconv.ParseInt(c.LastUpdated, 10, 64)
 	timestamp := int64(i)
 	if err != nil {
 		return "parsing time error"
 	}
 	t := time.Unix(timestamp, 0)
-	return fmt.Sprintf("💵 %s: $%s  %s", c.Symbol, c.UsdPrice, t.Format(layout))
+	return t.Format(layout)
 }
 
-func (c Currency) AsUsdValue() string {
-	return ""
+func (c *Currency) CurrencyFormating() string {
+	changeOneHour, _ := c.GetPercentChangeOneHourAsFloat()
+	changeOneDay, _ := c.GetPercentChangeOneDayAsFloat()
+	changeOneWeek, _ := c.GetPercentChangeOneWeekAsFloat()
+	return fmt.Sprintf("💵 %s: $%s \n %s \n Change 1h: %f \n Change 1d: %f \n Change 1w: %f", c.Symbol, c.UsdPrice, c.GetLastUpdateTimeAsString(), changeOneHour, changeOneDay, changeOneWeek)
 }
 
 type ResponseCurrencies struct {
