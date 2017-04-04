@@ -35,7 +35,7 @@ func (c *Config) GetFullServerUrl() string {
 func GetDefaultConfig() (*Config, error) {
 	var yamlFile []byte
 	var err error
-	filename, _ := filepath.Abs("./conf/app.yml")
+	filename, _ := filepath.Abs("./conf/app.yaml")
 	yamlFile, err = ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
