@@ -14,3 +14,8 @@ $ go run main.go
 
 * /eth - ethereum in usd
 
+* /rpl - ripple in usd
+
+* /dash - dash in usd
+
+* /litecoin - litecoin in usd
