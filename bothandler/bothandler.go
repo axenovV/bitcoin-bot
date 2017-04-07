@@ -57,6 +57,21 @@ func (b *BotTelegramHandler) handleCommand(command string, message tgbotapi.Mess
 		if err == nil {
 			message.Text = response.GetCurrenciesText()
 		}
+	case "rpl":
+		response, err := models.RequestCurrencies("ripple")
+		if err == nil {
+			message.Text = response.GetCurrenciesText()
+		}
+	case "dash":
+		response, err := models.RequestCurrencies("dash")
+		if err == nil {
+			message.Text = response.GetCurrenciesText()
+		}
+	case "litecoin":
+		response, err := models.RequestCurrencies("litecoin")
+		if err == nil {
+			message.Text = response.GetCurrenciesText()
+		}
 	default:
 	}
 	b.BotUpdates.Send(message)
