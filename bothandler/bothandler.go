@@ -10,8 +10,15 @@ import (
 )
 
 const (
-	Ticker = "/ticker"
+	Start = "/start"
+	Price = "/price"
+	Best = "/best"
+	Capitalization = "/cap"
+	Help = "/help"
 	Portfolio = "/portfolio"
+
+	//coins
+	Bitcoin = "bitcoin"
 )
 
 type BotTelegramHandler struct {
@@ -47,12 +54,50 @@ func (b *BotTelegramHandler) getBot(token string) error {
 }
 
 func (b *BotTelegramHandler) setupHandlers() {
-	b.BotUpdates.Handle(Ticker, func(m *tb.Message) {
+
+	b.BotUpdates.Handle(Start, func(m *tb.Message) {
+
+	})
+
+	b.BotUpdates.Handle(Best, func(m *tb.Message) {
+		response, err := models.RequestTopCurrencies()
+		if err == nil {
+			b.BotUpdates.Send(m.Sender, response.TopCurrencies())
+		} else {
+			b.BotUpdates.Send(m.Sender, err.Error())
+		}
+	})
+
+	b.BotUpdates.Handle(Capitalization, func(m *tb.Message) {
 		response, err := models.RequestCurrencies(m.Payload)
+		if err == nil {
+			b.BotUpdates.Send(m.Sender, response.MarketCapCurrencies())
+		} else {
+			b.BotUpdates.Send(m.Sender, err.Error())
+		}
+	})
+
+	b.BotUpdates.Handle(Help, func(m *tb.Message) {
+
+	})
+
+	b.BotUpdates.Handle(Price, func(m *tb.Message) {
+		var currency string
+		if len(m.Payload) == 0 {
+			currency = Bitcoin
+		} else {
+			currency = m.Payload
+		}
+		response, err := models.RequestCurrencies(currency)
 		if err == nil {
 			b.BotUpdates.Send(m.Sender, response.GetCurrenciesText())
 		} else {
 			b.BotUpdates.Send(m.Sender, err.Error())
 		}
 	})
+
+	b.BotUpdates.Handle(Portfolio, func(m *tb.Message) {
+
+	})
+
 }

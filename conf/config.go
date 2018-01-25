@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var MainConfig, err = GetDefaultConfig()
+
 type Config struct {
 	// Токен телеграм бота
 	Token string `yaml:"token"`
