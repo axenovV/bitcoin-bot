@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"log"
 )
 
 const layout = "Jan 2 2006 3:04pm MST"
@@ -74,6 +75,7 @@ func (c *ResponseCurrencies) GetCurrenciesText() string {
 
 func RequestCurrencies(currency string) (*ResponseCurrencies, error) {
 	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/" + currency)
+
 	if err != nil {
 		return nil, err
 	}

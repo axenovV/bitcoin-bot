@@ -1,6 +1,6 @@
 
 
-token: <token_here>
+token: 332036608:AAF-mN0FibX30-ESwHz8nmQxZAWlcvjqUNE
 webhook_url: <webhook_here> #like https://www.weebhook.com
 webhook_port: <port_here> #only 443, 80, 88 or 8443.
 server_url: <server_url>

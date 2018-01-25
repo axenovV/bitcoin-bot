@@ -5,7 +5,10 @@ import (
 
 	"github.com/axenovv/bitcoin-bot/bothandler"
 	"github.com/axenovv/bitcoin-bot/conf"
+
 )
+
+var handler = bothandler.BotTelegramHandler{}
 
 func main() {
 	startListeningBotUpdate()
@@ -13,12 +16,14 @@ func main() {
 
 func startListeningBotUpdate() {
 	config, configErr := conf.GetDefaultConfig()
+
 	if configErr != nil {
-		log.Print(configErr)
+		log.Panic(configErr)
 	}
-	bot := &bothandler.BotTelegramHandler{}
-	err := bot.ConnectToBot(config)
+
+
+	err := handler.ConnectToBot(config)
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 	}
 }
