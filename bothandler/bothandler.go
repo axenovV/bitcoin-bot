@@ -23,6 +23,7 @@ const (
 
 )
 
+
 type BotTelegramHandler struct {
 	BotUpdates *tb.Bot
 }
@@ -58,10 +59,7 @@ func (b *BotTelegramHandler) getBot(token string) error {
 func (b *BotTelegramHandler) setupHandlers() {
 
 	b.BotUpdates.Handle(Start, func(m *tb.Message) {
-		b.BotUpdates.Send(m.Sender, "Hi, I'm the @CryptoCoinCapBot🐳 \n\n" +
-					"*Commands* \n" +
-					"/price price \n" +
-					"/cap capitalization", tb.ModeMarkdown)
+		b.BotUpdates.Send(m.Sender, models.Localization.StartCommand, tb.ModeMarkdown)
 	})
 
 	b.BotUpdates.Handle(Best, func(m *tb.Message) {
@@ -74,16 +72,25 @@ func (b *BotTelegramHandler) setupHandlers() {
 	})
 
 	b.BotUpdates.Handle(Capitalization, func(m *tb.Message) {
-		response, err := models.RequestCurrencies(m.Payload)
-		if err == nil {
-			b.BotUpdates.Send(m.Sender, response.MarketCapCurrencies())
+		if len(m.Payload) == 0 {
+			response, err := models.RequestGlobalData()
+			if err == nil {
+				b.BotUpdates.Send(m.Sender, response.RenderChatMessage())
+			} else {
+				b.BotUpdates.Send(m.Sender, err.Error())
+			}
 		} else {
-			b.BotUpdates.Send(m.Sender, err.Error())
+			response, err := models.RequestCurrencies(m.Payload)
+			if err == nil {
+				b.BotUpdates.Send(m.Sender, response.MarketCapCurrencies())
+			} else {
+				b.BotUpdates.Send(m.Sender, err.Error())
+			}
 		}
 	})
 
 	b.BotUpdates.Handle(Help, func(m *tb.Message) {
-
+		b.BotUpdates.Send(m.Sender, models.Localization.HelpCommand, tb.ModeMarkdown)
 	})
 
 	b.BotUpdates.Handle(Price, func(m *tb.Message) {

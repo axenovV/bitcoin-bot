@@ -6,9 +6,46 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
+	"github.com/patrickmn/go-cache"
 	"github.com/leekchan/accounting"
+	"time"
 )
+
+var c = cache.New(5*time.Minute, 10*time.Minute)
+
+type ResponseGlobalData struct {
+	TotalMarketCapUsd                float64 `json:"total_market_cap_usd"`
+	Total24VolumeUsd                 float64 `json:"total_24h_volume_usd"`
+	BitcoinPercentageOfMarketCap     float64 `json:"bitcoin_percentage_of_market_cap"`
+	ActiveCurrencies                 int 	 `json:"active_currencies"`
+	ActiveAssets               		 int     `json:"active_assets"`
+	ActiveMarkets                	 int     `json:"active_markets"`
+
+}
+
+func (r *ResponseGlobalData) GetTotalMarketCapUsd() string {
+	return ac.FormatMoney(r.TotalMarketCapUsd)
+}
+
+func (r *ResponseGlobalData) GetTotal24VolumeUsd() string {
+	return ac.FormatMoney(r.Total24VolumeUsd)
+}
+
+func (r *ResponseGlobalData) GetBitcoinPercentageOfMarketCap() string {
+	return fmt.Sprintf("%.2f%%", r.BitcoinPercentageOfMarketCap)
+}
+
+func (r *ResponseGlobalData) RenderChatMessage() string {
+	return fmt.Sprintf("Market Cap: %s \n" +
+		                      "Bitcoin Dominance: %s \n" +
+			                  "24H Volume: %s", r.GetTotalMarketCapUsd(), r.GetBitcoinPercentageOfMarketCap(), r.GetTotal24VolumeUsd())
+}
+
+func (r *ResponseGlobalData) UnmurshalJSON(bytes []byte) error {
+	return json.Unmarshal(bytes, &r)
+}
+
+// Response Currencies
 
 type ResponseCurrencies struct {
 	Result []Currency
@@ -47,6 +84,7 @@ func (c *ResponseCurrencies) TopCurrencies() string {
 
 var ac = accounting.Accounting{Symbol: "$", Precision: 2}
 
+// Currency
 
 type Currency struct {
 	Id                   string `json:"id"`
@@ -104,30 +142,82 @@ func (c *Currency) CurrencyFormating() string {
 						      				c.getVolume24())
 }
 
+// Other
+
 func floatFromString(value string) (float64, error) {
 	percent, err := strconv.ParseFloat(value, 64)
 	return percent, err
 }
 
 func RequestCurrencies(currency string) (*ResponseCurrencies, error) {
-	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/" + currency)
 
+	url := "https://api.coinmarketcap.com/v1/ticker/" + currency
+
+	value, found := c.Get(url)
+
+	if found {
+		return value.(*ResponseCurrencies), nil
+	} else {
+		resp, err := http.Get(url)
+
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			return nil, err
+		}
+
+		var response = &ResponseCurrencies{}
+		err = response.UnmurshalJSON(body)
+		if err == nil {
+			c.Set(url, response, cache.DefaultExpiration)
+		}
+		return response, err
+	}
+}
+
+func RequestGlobalData() (*ResponseGlobalData, error)  {
+
+	url := "https://api.coinmarketcap.com/v1/global/"
+
+	value, found := c.Get(url)
+
+	if found {
+		return value.(*ResponseGlobalData), nil
+	}
+
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
 	}
-	var response = &ResponseCurrencies{}
-	return response, response.UnmurshalJSON(body)
+	var response = &ResponseGlobalData{}
+	err = response.UnmurshalJSON(body)
+	if err == nil {
+		c.Set(url, response, cache.DefaultExpiration)
+	}
+	return response, err
 }
 
 func RequestTopCurrencies() (*ResponseCurrencies, error) {
-	resp, err := http.Get("https://api.coinmarketcap.com/v1/ticker/?limit=10")
+
+	url := "https://api.coinmarketcap.com/v1/ticker/?limit=10"
+
+	value, found := c.Get(url)
+
+	if found {
+		return value.(*ResponseCurrencies), nil
+	}
+	resp, err := http.Get(url)
 
 	if err != nil {
 		return nil, err
@@ -140,5 +230,9 @@ func RequestTopCurrencies() (*ResponseCurrencies, error) {
 		return nil, err
 	}
 	var response = &ResponseCurrencies{}
-	return response, response.UnmurshalJSON(body)
+	err = response.UnmurshalJSON(body)
+	if err == nil {
+		c.Set(url, response, cache.DefaultExpiration)
+	}
+	return response, err
 }

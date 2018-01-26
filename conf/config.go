@@ -13,17 +13,18 @@ var MainConfig, err = GetDefaultConfig()
 
 type Config struct {
 	// Токен телеграм бота
-	Token string `yaml:"token"`
+	Token string 						`yaml:"token"`
 
-	WebhookUrl  string `yaml:"webhook_url"`
-	WebhookPort string `yaml:"webhook_port"`
+	WebhookUrl  string 					`yaml:"webhook_url"`
+	WebhookPort string 					`yaml:"webhook_port"`
 
-	ServerUrl  string `yaml:"server_url"`
-	ServerPort string `yaml:"server_port"`
+	ServerUrl  string 					`yaml:"server_url"`
+	ServerPort string 					`yaml:"server_port"`
 
-	ApiUrl string `yaml:"api_url"`
+	ApiUrl string 						`yaml:"api_url"`
 
-	ConvertCurrencyCommands []string `yaml:"convert_currency_commands"`
+	ConvertCurrencyCommands []string 	`yaml:"convert_currency_commands"`
+
 }
 
 func (c *Config) GetFullWebHookUrl() string {
