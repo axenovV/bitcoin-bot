@@ -10,6 +10,7 @@ import (
 )
 
 const (
+
 	Start = "/start"
 	Price = "/price"
 	Best = "/best"
@@ -19,6 +20,7 @@ const (
 
 	//coins
 	Bitcoin = "bitcoin"
+
 )
 
 type BotTelegramHandler struct {
@@ -56,13 +58,16 @@ func (b *BotTelegramHandler) getBot(token string) error {
 func (b *BotTelegramHandler) setupHandlers() {
 
 	b.BotUpdates.Handle(Start, func(m *tb.Message) {
-
+		b.BotUpdates.Send(m.Sender, "Hi, I'm the @CryptoCoinCapBot🐳 \n\n" +
+					"*Commands* \n" +
+					"/price price \n" +
+					"/cap capitalization", tb.ModeMarkdown)
 	})
 
 	b.BotUpdates.Handle(Best, func(m *tb.Message) {
 		response, err := models.RequestTopCurrencies()
 		if err == nil {
-			b.BotUpdates.Send(m.Sender, response.TopCurrencies())
+			b.BotUpdates.Send(m.Sender, response.TopCurrencies(), tb.ModeMarkdown)
 		} else {
 			b.BotUpdates.Send(m.Sender, err.Error())
 		}
@@ -90,7 +95,7 @@ func (b *BotTelegramHandler) setupHandlers() {
 		}
 		response, err := models.RequestCurrencies(currency)
 		if err == nil {
-			b.BotUpdates.Send(m.Sender, response.GetCurrenciesText())
+			b.BotUpdates.Send(m.Sender, response.GetCurrenciesText(), tb.ModeMarkdown)
 		} else {
 			b.BotUpdates.Send(m.Sender, err.Error())
 		}

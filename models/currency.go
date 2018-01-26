@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"github.com/leekchan/accounting"
 )
-
-const layout = "Jan 2 2006 3:04pm MST"
 
 type ResponseCurrencies struct {
 	Result []Currency
@@ -46,6 +45,8 @@ func (c *ResponseCurrencies) TopCurrencies() string {
 	return text
 }
 
+var ac = accounting.Accounting{Symbol: "$", Precision: 2}
+
 
 type Currency struct {
 	Id                   string `json:"id"`
@@ -62,44 +63,46 @@ type Currency struct {
 	Volume 				 string `json:"24h_volume_usd"`
 }
 
+func (c *Currency) getMarketCapPrice() string {
+	marketCapUsd, _ :=  floatFromString(c.MarketCapUsd)
+	return ac.FormatMoney(marketCapUsd)
+}
+
+func (c *Currency) getVolume24() string {
+	volume24, _ :=  floatFromString(c.Volume)
+	return ac.FormatMoney(volume24)
+}
+
+func (c *Currency) getUsdPrice() string {
+	usdPrice, _ :=  floatFromString(c.UsdPrice)
+	return ac.FormatMoney(usdPrice)
+}
+
 func (c *Currency) SimplePrice() string {
 	changeOneDay, _ :=  floatFromString(c.PercentChangeOneDay)
-	return fmt.Sprintf("%s  $%s  (%.2f%%)", c.Symbol, c.UsdPrice, changeOneDay)
+	return fmt.Sprintf("%s  %s  (%.2f%%)", c.Symbol, c.getUsdPrice(), changeOneDay)
 }
 
 func (c *Currency) GetMarketCap() string {
-	marketCapUsd, _ :=  floatFromString(c.MarketCapUsd)
-	return fmt.Sprintf("%s Rank: %s\n" + "Marketcap: %.2f$", c.Symbol, c.Rank, marketCapUsd)
-}
-
-func (c *Currency) GetLastUpdateTimeAsString() string {
-	i, err := strconv.ParseInt(c.LastUpdated, 10, 64)
-	timestamp := int64(i)
-	if err != nil {
-		return "parsing time error"
-	}
-	t := time.Unix(timestamp, 0)
-	return t.Format(layout)
+	return fmt.Sprintf("%s Rank: %s\n" + "Marketcap: %s", c.Symbol, c.Rank, c.getMarketCapPrice())
 }
 
 func (c *Currency) CurrencyFormating() string {
 	changeOneHour, _ := floatFromString(c.PercentChangeOneHour)
 	changeOneDay, _ :=  floatFromString(c.PercentChangeOneDay)
 	changeOneWeek, _ := floatFromString(c.PercentChangeOneWeek)
-	volume24, _ := floatFromString(c.Volume)
-	return fmt.Sprintf("💵 %s $%s \n" +
-		                      "🕔 Last Update: %s \n" +
+	return fmt.Sprintf("💵 *%s %s* \n" +
 		                      	"📈 Change 1h: %.2f%% \n" +
 						      "📈 Change 1d: %.2f%% \n" +
 					          "📈 Change 1w: %.2f%% \n" +
-						      "📈 Vol: %.0f$",
-						      	c.Symbol, c.UsdPrice,
-								c.GetLastUpdateTimeAsString(),
-									changeOneHour, changeOneDay,
-										changeOneWeek,
-											volume24)
+						      "📈 Vol: %s",
+						      	c.Symbol,
+						      	c.getUsdPrice(),
+						      				changeOneHour,
+						      				changeOneDay,
+						      				changeOneWeek,
+						      				c.getVolume24())
 }
-
 
 func floatFromString(value string) (float64, error) {
 	percent, err := strconv.ParseFloat(value, 64)
