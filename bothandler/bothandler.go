@@ -15,6 +15,7 @@ const (
 	Price = "/price"
 	Best = "/best"
 	Capitalization = "/cap"
+	ICO = "/ico"
 	Help = "/help"
 	Portfolio = "/portfolio"
 
@@ -86,6 +87,14 @@ func (b *BotTelegramHandler) setupHandlers() {
 			} else {
 				b.BotUpdates.Send(m.Sender, err.Error())
 			}
+		}
+	})
+
+	b.BotUpdates.Handle(ICO, func(m *tb.Message) {
+		response, err := models.GetLiveIcos()
+		log.Print(response.Ico.RenderChatMessage())
+		if err == nil {
+			b.BotUpdates.Send(m.Sender, response.Ico.RenderChatMessage(), tb.ModeMarkdown)
 		}
 	})
 
