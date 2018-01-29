@@ -7,6 +7,8 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 	"time"
 	"github.com/axenovv/bitcoin-bot/models"
+	"github.com/axenovv/bitcoin-bot/database"
+	"fmt"
 )
 
 const (
@@ -18,6 +20,8 @@ const (
 	ICO = "/ico"
 	Help = "/help"
 	Portfolio = "/portfolio"
+
+	Private = "/private"
 
 	//coins
 	Bitcoin = "bitcoin"
@@ -60,6 +64,7 @@ func (b *BotTelegramHandler) getBot(token string) error {
 func (b *BotTelegramHandler) setupHandlers() {
 
 	b.BotUpdates.Handle(Start, func(m *tb.Message) {
+		database.SaveMessage(m)
 		b.BotUpdates.Send(m.Sender, models.Localization.StartCommand, tb.ModeMarkdown)
 	})
 
@@ -70,6 +75,12 @@ func (b *BotTelegramHandler) setupHandlers() {
 		} else {
 			b.BotUpdates.Send(m.Sender, err.Error())
 		}
+	})
+
+	b.BotUpdates.Handle(Private, func(m *tb.Message) {
+	   users, _ := database.GetUniqueUsers()
+	   str := fmt.Sprintf("%d unique users", len(users))
+	   b.BotUpdates.Send(m.Sender, str)
 	})
 
 	b.BotUpdates.Handle(Capitalization, func(m *tb.Message) {
