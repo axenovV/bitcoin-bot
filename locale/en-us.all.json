@@ -1,4 +1,4 @@
 {
   "start_command": "Hi, I'm the @CryptoCoinCapBot🐳 \n\n*Commands* \n/price price \n/cap capitalization \n/help help summary and contact",
-  "help_command": "*Price Information* \n/p coin - Checks prices of the coin \n\n*Market Caps* \n/cap full coin name - pulls the market cap and ranking of the coin \n/cap - shows the total market cap \n/best - shows the top 10 coins by marketcap\n\n*News and Events* \n/ico - shows the live ico\n\n*Developer* @nickaxenov\n\n*Donate*\nBTC: \nETH:"
+  "help_command": "*Price Information* \n/p coin - Checks prices of the coin \n\n*Market Caps* \n/cap full coin name - pulls the market cap and ranking of the coin \n/cap - shows the total market cap \n/best - shows the top 10 coins by marketcap\n\n*News and Events* \n/ico - shows the live ico\n\n*Developer* @nickaxenov\n\n*Donate*\nETH: 0xedb1aafcb185922a56811718aa5468074b47b3f5"
 }
