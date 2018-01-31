@@ -5,7 +5,6 @@ import (
 
 	"github.com/axenovv/bitcoin-bot/bothandler"
 	"github.com/axenovv/bitcoin-bot/conf"
-
 )
 
 var handler = bothandler.BotTelegramHandler{}

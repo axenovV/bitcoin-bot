@@ -94,7 +94,7 @@ func (b *BotTelegramHandler) setupHandlers() {
 		} else {
 			response, err := models.RequestCurrencies(m.Payload)
 			if err == nil {
-				b.BotUpdates.Send(m.Sender, response.MarketCapCurrencies())
+				b.BotUpdates.Send(m.Sender, response.GetMarketCap())
 			} else {
 				b.BotUpdates.Send(m.Sender, err.Error())
 			}
@@ -122,7 +122,7 @@ func (b *BotTelegramHandler) setupHandlers() {
 		}
 		response, err := models.RequestCurrencies(currency)
 		if err == nil {
-			b.BotUpdates.Send(m.Sender, response.GetCurrenciesText(), tb.ModeMarkdown)
+			b.BotUpdates.Send(m.Sender, response.CurrencyFormating(), tb.ModeMarkdown)
 		} else {
 			b.BotUpdates.Send(m.Sender, err.Error())
 		}

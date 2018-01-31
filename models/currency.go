@@ -9,6 +9,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/leekchan/accounting"
 	"time"
+	"strings"
 )
 
 var c = cache.New(5*time.Minute, 10*time.Minute)
@@ -87,58 +88,44 @@ var ac = accounting.Accounting{Symbol: "$", Precision: 2}
 // Currency
 
 type Currency struct {
-	Id                   string `json:"id"`
-	Name                 string `json:"name"`
-	Symbol               string `json:"symbol"`
-	UsdPrice             string `json:"price_usd"`
-	EurPrice             string `json:"price_eur"`
-	Rank 				 string `json:"rank"`
-	MarketCapUsd 		 string `json:"market_cap_usd"`
-	LastUpdated          string `json:"last_updated"`
-	PercentChangeOneHour string `json:"percent_change_1h"`
-	PercentChangeOneDay  string `json:"percent_change_24h"`
-	PercentChangeOneWeek string `json:"percent_change_7d"`
-	Volume 				 string `json:"24h_volume_usd"`
-}
+	Id                   string  `json:"id"`
+	Name                 string  `json:"display_name"`
+	Rank  				 int8    `json:"rank"`
+	UsdPrice             float64 `json:"price_usd"`
+	EurPrice             float64 `json:"price_eur"`
+	MarketCapUsd 		 float64 `json:"market_cap"`
+	Volume 				 float64 `json:"volume"`
+	CapChange24h         float64 `json:"cap24hrChange"`
+	}
 
 func (c *Currency) getMarketCapPrice() string {
-	marketCapUsd, _ :=  floatFromString(c.MarketCapUsd)
-	return ac.FormatMoney(marketCapUsd)
+	return ac.FormatMoney(c.MarketCapUsd)
 }
 
 func (c *Currency) getVolume24() string {
-	volume24, _ :=  floatFromString(c.Volume)
-	return ac.FormatMoney(volume24)
+	return ac.FormatMoney(c.Volume)
 }
 
 func (c *Currency) getUsdPrice() string {
-	usdPrice, _ :=  floatFromString(c.UsdPrice)
-	return ac.FormatMoney(usdPrice)
+	return ac.FormatMoney(c.UsdPrice)
 }
 
 func (c *Currency) SimplePrice() string {
-	changeOneDay, _ :=  floatFromString(c.PercentChangeOneDay)
-	return fmt.Sprintf("%s  %s  (%.2f%%)", c.Symbol, c.getUsdPrice(), changeOneDay)
+	return fmt.Sprintf("%s  %s  (%.2f%%)", c.Id, c.getUsdPrice(), c.CapChange24h)
 }
 
 func (c *Currency) GetMarketCap() string {
-	return fmt.Sprintf("%s Rank: %s\n" + "Marketcap: %s", c.Symbol, c.Rank, c.getMarketCapPrice())
+	return fmt.Sprintf("%s Rank: %s\n" + "Marketcap: %s", c.Id, c.Rank, c.getMarketCapPrice())
 }
 
 func (c *Currency) CurrencyFormating() string {
-	changeOneHour, _ := floatFromString(c.PercentChangeOneHour)
-	changeOneDay, _ :=  floatFromString(c.PercentChangeOneDay)
-	changeOneWeek, _ := floatFromString(c.PercentChangeOneWeek)
+
 	return fmt.Sprintf("💵 *%s %s* \n" +
-		                      	"📈 Change 1h: %.2f%% \n" +
-						      "📈 Change 1d: %.2f%% \n" +
-					          "📈 Change 1w: %.2f%% \n" +
+		                      	"📈 Capitalization 24h: %.2f%% \n" +
 						      "📈 Vol: %s",
-						      	c.Symbol,
+						      	c.Id,
 						      	c.getUsdPrice(),
-						      				changeOneHour,
-						      				changeOneDay,
-						      				changeOneWeek,
+						      		c.CapChange24h,
 						      				c.getVolume24())
 }
 
@@ -149,14 +136,14 @@ func floatFromString(value string) (float64, error) {
 	return percent, err
 }
 
-func RequestCurrencies(currency string) (*ResponseCurrencies, error) {
+func RequestCurrencies(currency string) (*Currency, error) {
 
-	url := "https://api.coinmarketcap.com/v1/ticker/" + currency
+	url := "http://coincap.io/page/" + strings.ToUpper(currency)
 
 	value, found := c.Get(url)
 
 	if found {
-		return value.(*ResponseCurrencies), nil
+		return value.(*Currency), nil
 	} else {
 		resp, err := http.Get(url)
 
@@ -171,8 +158,8 @@ func RequestCurrencies(currency string) (*ResponseCurrencies, error) {
 			return nil, err
 		}
 
-		var response = &ResponseCurrencies{}
-		err = response.UnmurshalJSON(body)
+		var response = &Currency{}
+		err = json.Unmarshal(body, &response)
 		if err == nil {
 			c.Set(url, response, cache.DefaultExpiration)
 		}
