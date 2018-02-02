@@ -11,7 +11,7 @@ type User struct {
 	Nickname string `storm:"index"`
 }
 
-var dbStorm, err = storm.Open("my.db")
+var dbStorm, err = storm.Open("statistic.db")
 
 
 func SaveMessage(m *tb.Message) {
